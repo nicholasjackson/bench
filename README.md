@@ -1,6 +1,6 @@
 # Bench
 [![GoDoc](https://godoc.org/github.com/nicholasjackson/bench?status.svg)](https://godoc.org/github.com/nicholasjackson/bench) [![CircleCI](https://circleci.com/gh/nicholasjackson/bench.svg?style=svg)](https://circleci.com/gh/nicholasjackson/bench)
-
+[![codecov](https://codecov.io/gh/nicholasjackson/bench/branch/master/graph/badge.svg)](https://codecov.io/gh/nicholasjackson/bench)
 
 Bench is a simple load testing application for Microservices, I built this as I wanted to be able run some basic performance tests against the microservice frameworks which I am evaluating for my book "Building Microservices In Go".  Whilst there are many options to be able to test HTTP based services I could find nothing which would serve the purpose of being able to benchmark an RPC server or another framework which did not use JSON or another text based object like XML over REST.  
 
