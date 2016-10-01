@@ -11,8 +11,6 @@ dependencies:
 
 test:
   override:
-    - cd $WKDIR/bench && go get -t -d -v -race ./...
-    - cd $WKDIR/bench && go build -v
-    - cd $WKDIR/bench && overalls -project=github.com/nicholasjackson/bench -covermode=atomic
+    - GOPATH=/home/ubuntu/go overalls -project=github.com/nicholasjackson/bench -covermode=atomic
     - cd $WKDIR/bench && mv overalls.coverprofile coverage.txt
     - cd $WKDIR/bench && bash <(curl -s https://codecov.io/bash)
