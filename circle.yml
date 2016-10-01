@@ -1,5 +1,11 @@
+machine:
+  environment:
+    GOPATH: /home/ubuntu/go
+
 dependencies:
   pre:
+    - mkdir -p $GOPATH/github.com/src/nicholasjackson
+    - cp -R /home/ubuntu/bench /home/ubuntu/go/src/github.com/nicholasjackson/
     - go get -u github.com/go-playground/overalls
 
 test:
