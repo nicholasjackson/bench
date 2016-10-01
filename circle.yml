@@ -1,3 +1,7 @@
+machine:
+  environment:
+    GOPATH: "${HOME}/.go_project"
+
 dependencies:
   pre:
     - go get -u github.com/go-playground/overalls
