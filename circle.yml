@@ -1,7 +1,6 @@
 dependencies:
-  dependencies:
-      pre:
-        - go get -u github.com/go-playground/overalls
+  pre:
+    - go get -u github.com/go-playground/overalls
 
 test:
   post:
