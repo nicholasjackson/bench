@@ -1,7 +1,12 @@
 test:
   pre:
     - go get github.com/mattn/goveralls
+    - go get github.com/modocache/gover
   override:
-    - go test -v -cover -race -coverprofile=/home/ubuntu/coverage.out
+    - go test -v -cover -race -coverprofile=bench.coverprofile
+    - go test -v -cover -race -coverprofile=errors.coverprofile ./errors
+    - go test -v -cover -race -coverprofile=results.coverprofile ./results
+    - go test -v -cover -race -coverprofile=semaphore.coverprofile ./semaphore
   post:
-    - /home/ubuntu/.go_workspace/bin/goveralls -coverprofile=/home/ubuntu/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+    - gover
+    - goveralls -coverprofile=gover.coverprofile -service=circle-ci -repotoken=$COVERALLS_TOKEN
