@@ -1,16 +1,12 @@
-machine:
-  environment:
-    GOPATH: /home/ubuntu/go
-    WKDIR: $GOPATH/src/github.com/nicholasjackson
-
-dependencies:
-  pre:
-    - mkdir -p $WKDIR
-    - cp -R /home/ubuntu/bench $WKDIR/
-    - go get -u github.com/go-playground/overalls
-
 test:
+  pre:
+    - go get github.com/mattn/goveralls
+    - go get github.com/wadey/gocovmerge
   override:
-    - GOPATH=/home/ubuntu/go overalls -project=github.com/nicholasjackson/bench -covermode=atomic
-    - cd $WKDIR/bench && mv overalls.coverprofile coverage.txt
-    - cd $WKDIR/bench && bash <(curl -s https://codecov.io/bash)
+    - go test -v -cover -race -coverprofile=bench.coverprofile
+    - go test -v -cover -race -coverprofile=errors.coverprofile ./errors
+    - go test -v -cover -race -coverprofile=results.coverprofile ./results
+    - go test -v -cover -race -coverprofile=semaphore.coverprofile ./semaphore
+  post:
+    - gocovmerge *.coverprofile > coveralls.coverprofile
+    - goveralls -coverprofile=coveralls.coverprofile -service=circle-ci -repotoken=$COVERALLS_TOKEN
