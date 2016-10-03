@@ -19,14 +19,14 @@ func TestSortsResultSet(t *testing.T) {
 	assert.True(t, r1[0].Timestamp.Unix() < r1[1].Timestamp.Unix())
 }
 
-func TestDurationGreaterThanResultsSpanShouldReturn1Bucket(t *testing.T) {
+func TestDurationOf0ShouldReturn1Bucket(t *testing.T) {
 
 	r1 := ResultSet{
 		Result{Timestamp: time.Now()},
-		Result{Timestamp: time.Now()},
+		Result{Timestamp: time.Now().Add(20 * time.Millisecond)},
 	}
 
-	buckets := r1.Reduce(1000 * time.Minute)
+	buckets := r1.Reduce(0 * time.Minute)
 
 	assert.Equal(t, 1, len(buckets))
 }
@@ -34,11 +34,11 @@ func TestDurationGreaterThanResultsSpanShouldReturn1Bucket(t *testing.T) {
 func TestDurationSmallerThanResultsSpanShouldReturn2Buckets(t *testing.T) {
 
 	r1 := ResultSet{
-		Result{Timestamp: time.Now().Add(1001 * time.Millisecond)},
+		Result{Timestamp: time.Now().Add(1103 * time.Millisecond)},
 		Result{Timestamp: time.Now()},
 	}
 
-	buckets := r1.Reduce(1 * time.Second)
+	buckets := r1.Reduce(1000 * time.Millisecond)
 
 	assert.Equal(t, 2, len(buckets))
 }

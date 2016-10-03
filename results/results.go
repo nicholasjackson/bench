@@ -38,7 +38,7 @@ func (r ResultSet) Reduce(interval time.Duration) []ResultSet {
 
 	// create the buckets
 	bucketCount := getBucketCount(start, end, interval)
-	buckets := make([]ResultSet, bucketCount+1)
+	buckets := make([]ResultSet, bucketCount)
 
 	for _, result := range r {
 
@@ -50,13 +50,24 @@ func (r ResultSet) Reduce(interval time.Duration) []ResultSet {
 }
 
 func getBucketCount(start time.Time, end time.Time, interval time.Duration) int {
+	if interval == time.Duration(0) {
+		return 1
+	}
+
 	totalDuration := end.UnixNano() - start.UnixNano()
-	return int(totalDuration / int64(interval))
+	bucketCount := time.Duration(totalDuration) / interval // nanoseconds
+
+	return int(bucketCount) + 1
 }
 
 func getBucketNumber(current time.Time, start time.Time, end time.Time, interval time.Duration, bucketCount int) int {
+
+	if interval == time.Duration(0) {
+		return 0
+	}
+
 	bucketSize := int64(interval)
 	curr := end.UnixNano() - current.UnixNano()
 
-	return bucketCount - int(curr/bucketSize)
+	return bucketCount - int(curr/bucketSize) - 1
 }
