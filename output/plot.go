@@ -12,7 +12,6 @@ import (
 
 // PlotData plots the results onto a graph and saves the output to the given writer
 func PlotData(interval time.Duration, r results.ResultSet, w io.Writer) {
-
 	set := r.Reduce(interval)
 	t := results.TabularResults{}
 	rows := t.Tabulate(set)
@@ -140,9 +139,10 @@ func createXTicks(results []results.Row) []chart.Tick {
 	}
 
 	// add one last tick for the end
+	lastTick := results[len(results)-1].ElapsedTime
 	tick := chart.Tick{
-		Value: nextTick,
-		Label: fmt.Sprintf("%.0f", nextTick),
+		Value: lastTick.Seconds(),
+		Label: fmt.Sprintf("%.0f", lastTick.Seconds()),
 	}
 	ticks = append(ticks, tick)
 
