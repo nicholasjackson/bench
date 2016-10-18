@@ -121,7 +121,8 @@ func createXTicks(results []results.Row) []chart.Tick {
 	var ticks []chart.Tick
 
 	maxTicks := 20
-	tickInterval := float64(len(results)) / float64(maxTicks)
+	totalTime := results[len(results)-1].ElapsedTime.Seconds()
+	tickInterval := float64(totalTime) / float64(maxTicks)
 
 	fmt.Println(tickInterval)
 	nextTick := 0.0
