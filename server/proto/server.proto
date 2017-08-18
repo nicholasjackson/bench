@@ -1,0 +1,11 @@
+syntax = "proto3";
+package proto;
+
+message ExecuteRequest {}
+message RunRequest {}
+message ServerEmpty {}
+
+service BenchServer {
+  rpc Execute(ExecuteRequest) returns (ServerEmpty);
+  rpc Run(RunRequest) returns (ServerEmpty);
+}
