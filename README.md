@@ -13,7 +13,7 @@ Because Bench executes code compiled into a plugin, it is possible to use bench 
 
 # Installing bench
 ```bash
-$ go get -u github.com/nicholasjackson/bench/cli
+$ go get -u github.com/nicholasjackson/bench/bench
 ```
 
 # Commands
