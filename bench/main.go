@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/mitchellh/cli"
-	"github.com/nicholasjackson/bench/cli/commands"
+	"github.com/nicholasjackson/bench/bench/commands"
 )
 
 func main() {
