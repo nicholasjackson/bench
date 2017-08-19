@@ -2,6 +2,18 @@
 
 
 [[projects]]
+  name = "github.com/DataDog/datadog-go"
+  packages = ["statsd"]
+  revision = "0ddda6bee21174ef6c4873647cb0d6ec9cba996f"
+  version = "1.1.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/afex/hystrix-go"
+  packages = ["hystrix","hystrix/metric_collector","hystrix/rolling"]
+  revision = "f118cd938f786d24f46cc307981d8f63b7951020"
+
+[[projects]]
   branch = "master"
   name = "github.com/alecthomas/assert"
   packages = ["."]
@@ -54,6 +66,12 @@
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/eapache/go-resiliency"
+  packages = ["retrier"]
+  revision = "6800482f2c813e689c88b7ed3282262385011890"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/fatih/color"
@@ -200,6 +218,12 @@
   revision = "d0303fe809921458f417bcf828397a65db30a7e4"
 
 [[projects]]
+  name = "github.com/nicholasjackson/ultraclient"
+  packages = ["."]
+  revision = "a10888f80f9d9daccc5a02bce4785c1c705b4b4b"
+  version = "0.6"
+
+[[projects]]
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
@@ -224,8 +248,14 @@
   revision = "feef008d51ad2b3778f85d387ccf91735543008d"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/stretchr/objx"
+  packages = ["."]
+  revision = "1a9d0bb9f541897e62256577b352fdbc1fb4fd94"
+
+[[projects]]
   name = "github.com/stretchr/testify"
-  packages = ["assert"]
+  packages = ["assert","mock"]
   revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
   version = "v1.1.4"
 
@@ -274,6 +304,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "620dd8a10da8cea9e29b8f97de734e6a224f7efd30fc7752d4f0e78b05d7d985"
+  inputs-digest = "b4c0349531f7102f35d70547de66ba720b051ec07d2856f36eba3371cb496785"
   solver-name = "gps-cdcl"
   solver-version = 1

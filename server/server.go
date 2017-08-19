@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/url"
 	"os"
 	"os/exec"
 	"time"
@@ -20,6 +21,7 @@ import (
 	"github.com/nicholasjackson/bench/bench/util"
 	"github.com/nicholasjackson/bench/plugin/shared"
 	"github.com/nicholasjackson/bench/server/proto"
+	"github.com/nicholasjackson/ultraclient"
 )
 
 var benchProcess *bench.Bench
@@ -121,10 +123,31 @@ func runBench(location string, servers []string, threads int64, duration time.Du
 	benchProcess.AddOutput(0*time.Second, util.NewFile("./error.txt"), output.WriteErrorLogs)
 
 	// get a load balancer
-	client := NewGRPCClient(servers[0])
-	defer client.Close()
+	var endpoints []url.URL
+	for _, s := range servers {
+		endpoints = append(endpoints, url.URL{Host: s})
+	}
+
+	lb := ultraclient.RoundRobinStrategy{}
+	bs := ultraclient.ExponentialBackoff{}
+
+	config := ultraclient.Config{
+		Timeout:                timeout,
+		MaxConcurrentRequests:  500,
+		ErrorPercentThreshold:  25,
+		DefaultVolumeThreshold: 10,
+		Retries:                1,
+		Endpoints:              endpoints,
+	}
+
+	uc := ultraclient.NewClient(config, &lb, &bs)
 
 	benchProcess.RunBenchmarks(func() error {
-		return client.Execute()
+		return uc.Do(func(endpoint url.URL) error {
+			client := NewGRPCClient(endpoint.Host)
+			defer client.Close()
+
+			return client.Execute()
+		})
 	})
 }
