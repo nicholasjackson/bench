@@ -2,10 +2,19 @@ syntax = "proto3";
 package proto;
 
 message ExecuteRequest {}
-message RunRequest {}
+
+message  RunRequest {
+  string pluginLocation  = 1;
+  int64  threads         = 2;
+  int64  duration        = 3;
+  int64  ramp            = 4;
+  int64  timeout         = 5;
+}
+
 message ServerEmpty {}
 
 service BenchServer {
   rpc Execute(ExecuteRequest) returns (ServerEmpty);
   rpc Run(RunRequest) returns (ServerEmpty);
+  rpc Stop(ServerEmpty) returns (ServerEmpty);
 }

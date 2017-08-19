@@ -2,18 +2,11 @@ package commands
 
 import (
 	"flag"
-	"fmt"
-	"os"
-	"os/exec"
 	"time"
 
-	hclog "github.com/hashicorp/go-hclog"
 	plugin "github.com/hashicorp/go-plugin"
-	"github.com/nicholasjackson/bench/bench"
-	"github.com/nicholasjackson/bench/bench/output"
-	"github.com/nicholasjackson/bench/bench/util"
-	"github.com/nicholasjackson/bench/plugin/shared"
 	"github.com/nicholasjackson/bench/server"
+	"github.com/nicholasjackson/bench/server/proto"
 )
 
 // Run is a cli command which allows running of benchmarks
@@ -39,16 +32,18 @@ func (r *Run) Help() string {
 func (r *Run) Run(args []string) int {
 	r.flagSet.Parse(args)
 
-	client := server.NewGRPCClient()
-	client.Run()
-
-	/*
-		if r.pluginLocation != "" {
-			c, bp := createPlugin(r.pluginLocation)
-			defer c.Kill()
-			r.runBench(bp)
+	if r.pluginLocation != "" {
+		req := proto.RunRequest{
+			PluginLocation: r.pluginLocation,
+			Threads:        int64(r.threads),
+			Duration:       int64(r.duration),
+			Ramp:           int64(r.rampUp),
+			Timeout:        int64(r.timeout),
 		}
-	*/
+		client := server.NewGRPCClient()
+		client.Run(req)
+	}
+
 	return 0
 }
 
@@ -70,49 +65,4 @@ func NewRun() *Run {
 	r.flagSet.DurationVar(&r.timeout, "timeout", 5*time.Second, "timeout value for a test e.g. 5s (5 seconds)")
 
 	return r
-}
-
-func createPlugin(pluginLocation string) (*plugin.Client, shared.Bench) {
-	logger := hclog.New(&hclog.LoggerOptions{
-		Output: hclog.DefaultOutput,
-		Level:  hclog.Info,
-		Name:   "plugin",
-	})
-
-	c := plugin.NewClient(&plugin.ClientConfig{
-		HandshakeConfig:  shared.Handshake,
-		Plugins:          shared.PluginMap,
-		Cmd:              exec.Command("sh", "-c", pluginLocation),
-		AllowedProtocols: []plugin.Protocol{plugin.ProtocolGRPC},
-		Logger:           logger,
-	})
-
-	// Connect via RPC
-	grpcClient, err := c.Client()
-	if err != nil {
-		fmt.Println("Error connecting:", err.Error())
-		os.Exit(1)
-	}
-
-	// Request the plugin
-	plug, err := grpcClient.Dispense("bench")
-	if err != nil {
-		fmt.Println("Error getting plugin:", err.Error())
-		os.Exit(1)
-	}
-
-	return c, plug.(shared.Bench)
-}
-
-func (r *Run) runBench(bp shared.Bench) {
-	b := bench.New(r.threads, r.duration, r.rampUp, r.timeout)
-
-	b.AddOutput(0*time.Second, os.Stdout, output.WriteTabularData)
-	b.AddOutput(1*time.Second, util.NewFile("./output.txt"), output.WriteTabularData)
-	b.AddOutput(1*time.Second, util.NewFile("./output.png"), output.PlotData)
-	b.AddOutput(0*time.Second, util.NewFile("./error.txt"), output.WriteErrorLogs)
-
-	b.RunBenchmarks(func() error {
-		return bp.Do()
-	})
 }

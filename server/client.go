@@ -12,8 +12,8 @@ type GRPCClient struct {
 	client proto.BenchServerClient
 }
 
-func (g *GRPCClient) Run() {
-	_, err := g.client.Run(context.Background(), &proto.RunRequest{})
+func (g *GRPCClient) Run(r proto.RunRequest) {
+	_, err := g.client.Run(context.Background(), &r)
 	if err != nil {
 		log.Println(err)
 	}

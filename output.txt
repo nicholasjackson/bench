@@ -1,0 +1,18 @@
+Start Time: 2017-08-19 10:02:15.885027 +0000 UTC
+Elapsed Time: 0s
+Threads: 2
+Total Requests: 63
+Avg Request Time: 33.272968ms
+Total Success: 63
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 10:02:16.847742 +0000 UTC
+Elapsed Time: 962.715ms
+Threads: 2
+Total Requests: 63
+Avg Request Time: 31.518047ms
+Total Success: 63
+Total Timeouts: 0
+Total Failures: 0
+
