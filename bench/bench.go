@@ -51,7 +51,6 @@ func New(
 
 // AddOutput adds an output writer to Bench
 func (b *Bench) AddOutput(interval time.Duration, writer io.Writer, output output.OutputFunc) {
-
 	o := outputContainer{
 		interval: interval,
 		writer:   writer,
@@ -63,8 +62,12 @@ func (b *Bench) AddOutput(interval time.Duration, writer io.Writer, output outpu
 
 // RunBenchmarks runs the benchmarking for the given function
 func (b *Bench) RunBenchmarks(r RequestFunc) {
-
 	b.request = r
 	results := b.internalRun()
 	b.processResults(results)
+}
+
+// Stop any currently active benchmarks
+func (b *Bench) Stop() {
+	b.internalStop()
 }

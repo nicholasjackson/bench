@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+	"os"
+	"os/signal"
 	"time"
 
 	plugin "github.com/hashicorp/go-plugin"
@@ -40,7 +42,19 @@ func (r *Run) Run(args []string) int {
 			Ramp:           int64(r.rampUp),
 			Timeout:        int64(r.timeout),
 		}
+
 		client := server.NewGRPCClient()
+
+		go func(cl *server.GRPCClient) {
+			c := make(chan os.Signal, 1)
+			signal.Notify(c, os.Interrupt)
+
+			switch <-c {
+			case os.Interrupt:
+				cl.Stop()
+			}
+		}(client)
+
 		client.Run(req)
 	}
 

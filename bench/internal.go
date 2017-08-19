@@ -10,10 +10,17 @@ import (
 	"github.com/nicholasjackson/bench/bench/semaphore"
 )
 
+var stop bool
+
+func (b *Bench) internalStop() {
+	stop = true
+}
+
 // RunBenchmarks executes the benchmarks based upon the given criteria
 //
 // Returns a resultset
 func (b *Bench) internalRun() results.ResultSet {
+	stop = false
 
 	startTime := time.Now()
 	endTime := startTime.Add(b.duration)
@@ -24,8 +31,7 @@ func (b *Bench) internalRun() results.ResultSet {
 
 	go handleResult(out, resultsChan)
 
-	for run := true; run; run = (time.Now().Before(endTime)) {
-
+	for run := true; run && !stop; run = (time.Now().Before(endTime)) {
 		sem.Lock() // blocks when channel is full
 
 		// execute a request

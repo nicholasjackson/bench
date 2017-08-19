@@ -1,18 +1,27 @@
-Start Time: 2017-08-19 10:02:15.885027 +0000 UTC
+Start Time: 2017-08-19 10:20:52.274903 +0000 UTC
 Elapsed Time: 0s
 Threads: 2
-Total Requests: 63
-Avg Request Time: 33.272968ms
-Total Success: 63
+Total Requests: 5
+Avg Request Time: 215.6106ms
+Total Success: 5
 Total Timeouts: 0
 Total Failures: 0
 
-Start Time: 2017-08-19 10:02:16.847742 +0000 UTC
-Elapsed Time: 962.715ms
+Start Time: 2017-08-19 10:20:52.536675 +0000 UTC
+Elapsed Time: 261.772ms
 Threads: 2
-Total Requests: 63
-Avg Request Time: 31.518047ms
-Total Success: 63
+Total Requests: 30
+Avg Request Time: 69.6469ms
+Total Success: 30
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 10:20:53.557466 +0000 UTC
+Elapsed Time: 1.282563s
+Threads: 2
+Total Requests: 28
+Avg Request Time: 71.037035ms
+Total Success: 28
 Total Timeouts: 0
 Total Failures: 0
 

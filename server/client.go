@@ -19,6 +19,13 @@ func (g *GRPCClient) Run(r proto.RunRequest) {
 	}
 }
 
+func (g *GRPCClient) Stop() {
+	_, err := g.client.Stop(context.Background(), &proto.ServerEmpty{})
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 func NewGRPCClient() *GRPCClient {
 	conn, err := grpc.Dial("localhost:9999", grpc.WithInsecure())
 	if err != nil {
