@@ -11,10 +11,15 @@ message  RunRequest {
   int64  timeout         = 5;
 }
 
+message StartPluginRequest {
+  string pluginLocation = 1;
+}
+
 message ServerEmpty {}
 
 service BenchServer {
   rpc Execute(ExecuteRequest) returns (ServerEmpty);
+  rpc StartPlugin(StartPluginRequest) returns (ServerEmpty);
   rpc Run(RunRequest) returns (ServerEmpty);
   rpc Stop(ServerEmpty) returns (ServerEmpty);
 }

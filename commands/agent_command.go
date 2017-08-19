@@ -38,12 +38,13 @@ const (
 // ShutdownCh. If two messages are sent on the ShutdownCh it will forcibly
 // exit.
 type AgentCommand struct {
-	Ui            cli.Ui
-	ShutdownCh    <-chan struct{}
-	args          []string
-	scriptHandler *agent.ScriptEventHandler
-	logFilter     *logutils.LevelFilter
-	logger        *log.Logger
+	Ui              cli.Ui
+	ShutdownCh      <-chan struct{}
+	args            []string
+	scriptHandler   *agent.ScriptEventHandler
+	logFilter       *logutils.LevelFilter
+	logger          *log.Logger
+	benchServerPort int
 }
 
 // readConfig is responsible for setup of our configuration using
@@ -54,6 +55,7 @@ func (c *AgentCommand) readConfig() *agent.Config {
 	var tags []string
 	var retryInterval string
 	var broadcastTimeout string
+
 	cmdFlags := flag.NewFlagSet("agent", flag.ContinueOnError)
 	cmdFlags.Usage = func() { c.Ui.Output(c.Help()) }
 	cmdFlags.StringVar(&cmdConfig.BindAddr, "bind", "", "address to bind listeners to")
@@ -92,6 +94,9 @@ func (c *AgentCommand) readConfig() *agent.Config {
 	cmdFlags.BoolVar(&cmdConfig.RejoinAfterLeave, "rejoin", false,
 		"enable re-joining after a previous leave")
 	cmdFlags.StringVar(&broadcastTimeout, "broadcast-timeout", "", "timeout for broadcast messages")
+
+	cmdFlags.IntVar(&c.benchServerPort, "bench-port", 9999, "port for bench server")
+
 	if err := cmdFlags.Parse(c.args); err != nil {
 		return nil
 	}
@@ -334,6 +339,9 @@ func (c *AgentCommand) setupAgent(config *agent.Config, logOutput io.Writer) *ag
 		serfConfig.BroadcastTimeout = config.BroadcastTimeout
 	}
 
+	// Add the bench server port to the tags
+	serfConfig.Tags["benchServerPort"] = fmt.Sprintf("%d", c.benchServerPort)
+
 	// Start Serf
 	c.Ui.Output("Starting Serf agent...")
 	agent, err := agent.Create(config, serfConfig, logOutput)
@@ -341,6 +349,7 @@ func (c *AgentCommand) setupAgent(config *agent.Config, logOutput io.Writer) *ag
 		c.Ui.Error(fmt.Sprintf("Failed to start the Serf agent: %v", err))
 		return nil
 	}
+
 	return agent
 }
 
@@ -543,7 +552,7 @@ func (c *AgentCommand) Run(args []string) int {
 	retryJoinCh := make(chan struct{})
 	go c.retryJoin(config, agent, retryJoinCh)
 
-	server.NewGRPCServer()
+	server.NewGRPCServer(agent, c.benchServerPort)
 
 	// Wait for exit
 	return c.handleSignals(config, agent, retryJoinCh)
@@ -716,6 +725,7 @@ Options:
   -broadcast-timeout=5s    Sets the broadcast timeout, which is the max time allowed for
                            responses to events including leave and force remove messages.
                            Defaults to 5s.
+	-bench-port=9999         Port to run bench server on
 Event handlers:
   For more information on what event handlers are, please read the
   Serf documentation. This section will document how to configure them

@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/hashicorp/serf/cmd/serf/command/agent"
 	context "golang.org/x/net/context"
 
 	"google.golang.org/grpc"
@@ -22,18 +23,41 @@ import (
 )
 
 var benchProcess *bench.Bench
+var plug *plugin.Client
+var benchClient shared.Bench
 
-type GRPCServer struct{}
+type GRPCServer struct {
+	serf *agent.Agent
+	port int
+}
 
 func (g *GRPCServer) Execute(context.Context, *proto.ExecuteRequest) (*proto.ServerEmpty, error) {
-	log.Println("Execute")
-	return nil, nil
+	return &proto.ServerEmpty{}, benchClient.Do()
+}
+
+func (g *GRPCServer) StartPlugin(c context.Context, pr *proto.StartPluginRequest) (*proto.ServerEmpty, error) {
+	log.Println("Start Plugin")
+	plug, benchClient = createPlugin(pr.PluginLocation)
+
+	return &proto.ServerEmpty{}, nil
 }
 
 func (g *GRPCServer) Run(c context.Context, r *proto.RunRequest) (*proto.ServerEmpty, error) {
 	log.Println("Running Bench")
 
-	runBench(r.PluginLocation, r.Threads, time.Duration(r.Duration), time.Duration(r.Ramp), time.Duration(r.Timeout))
+	// get server members
+	members := make([]string, 0)
+	for _, m := range g.serf.Serf().Members() {
+		server := m.Addr.String() + ":" + m.Tags["benchServerPort"]
+		members = append(members, server)
+
+		log.Println("Start Plugin:", server)
+		client := NewGRPCClient(server)
+		defer client.Close()
+		client.StartPlugin(r.PluginLocation)
+	}
+
+	runBench(r.PluginLocation, members, r.Threads, time.Duration(r.Duration), time.Duration(r.Ramp), time.Duration(r.Timeout))
 
 	return &proto.ServerEmpty{}, nil
 }
@@ -43,15 +67,15 @@ func (g *GRPCServer) Stop(c context.Context, r *proto.ServerEmpty) (*proto.Serve
 	return &proto.ServerEmpty{}, nil
 }
 
-func NewGRPCServer() {
-	log.Println("Starting Bench Server")
+func NewGRPCServer(serf *agent.Agent, port int) {
+	log.Println("Starting Bench Server on Port:", port)
 	s := grpc.NewServer()
 
-	lis, err := net.Listen("tcp", ":9999")
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	proto.RegisterBenchServerServer(s, &GRPCServer{})
+	proto.RegisterBenchServerServer(s, &GRPCServer{serf: serf})
 
 	log.Fatal(s.Serve(lis))
 }
@@ -88,10 +112,7 @@ func createPlugin(pluginLocation string) (*plugin.Client, shared.Bench) {
 	return c, plug.(shared.Bench)
 }
 
-func runBench(location string, threads int64, duration time.Duration, ramp time.Duration, timeout time.Duration) {
-	p, bp := createPlugin(location)
-	defer p.Kill()
-
+func runBench(location string, servers []string, threads int64, duration time.Duration, ramp time.Duration, timeout time.Duration) {
 	benchProcess = bench.New(int(threads), duration, ramp, timeout)
 
 	benchProcess.AddOutput(0*time.Second, os.Stdout, output.WriteTabularData)
@@ -99,7 +120,11 @@ func runBench(location string, threads int64, duration time.Duration, ramp time.
 	benchProcess.AddOutput(1*time.Second, util.NewFile("./output.png"), output.PlotData)
 	benchProcess.AddOutput(0*time.Second, util.NewFile("./error.txt"), output.WriteErrorLogs)
 
+	// get a load balancer
+	client := NewGRPCClient(servers[0])
+	defer client.Close()
+
 	benchProcess.RunBenchmarks(func() error {
-		return bp.Do()
+		return client.Execute()
 	})
 }

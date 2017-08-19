@@ -1,27 +1,90 @@
-Start Time: 2017-08-19 10:20:52.274903 +0000 UTC
+Start Time: 2017-08-19 11:56:29.906733 +0000 UTC
 Elapsed Time: 0s
 Threads: 2
-Total Requests: 5
-Avg Request Time: 215.6106ms
-Total Success: 5
+Total Requests: 15
+Avg Request Time: 141.2174ms
+Total Success: 15
 Total Timeouts: 0
 Total Failures: 0
 
-Start Time: 2017-08-19 10:20:52.536675 +0000 UTC
-Elapsed Time: 261.772ms
+Start Time: 2017-08-19 11:56:30.587796 +0000 UTC
+Elapsed Time: 681.063ms
 Threads: 2
 Total Requests: 30
-Avg Request Time: 69.6469ms
+Avg Request Time: 66.807766ms
 Total Success: 30
 Total Timeouts: 0
 Total Failures: 0
 
-Start Time: 2017-08-19 10:20:53.557466 +0000 UTC
-Elapsed Time: 1.282563s
+Start Time: 2017-08-19 11:56:31.586491 +0000 UTC
+Elapsed Time: 1.679758s
+Threads: 2
+Total Requests: 27
+Avg Request Time: 72.952333ms
+Total Success: 27
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 11:56:32.560367 +0000 UTC
+Elapsed Time: 2.653634s
 Threads: 2
 Total Requests: 28
-Avg Request Time: 71.037035ms
+Avg Request Time: 69.450857ms
 Total Success: 28
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 11:56:33.573216 +0000 UTC
+Elapsed Time: 3.666483s
+Threads: 2
+Total Requests: 31
+Avg Request Time: 67.03729ms
+Total Success: 31
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 11:56:34.587568 +0000 UTC
+Elapsed Time: 4.680835s
+Threads: 2
+Total Requests: 30
+Avg Request Time: 66.661166ms
+Total Success: 30
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 11:56:35.602219 +0000 UTC
+Elapsed Time: 5.695486s
+Threads: 2
+Total Requests: 29
+Avg Request Time: 68.581172ms
+Total Success: 29
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 11:56:36.567426 +0000 UTC
+Elapsed Time: 6.660693s
+Threads: 2
+Total Requests: 31
+Avg Request Time: 65.433677ms
+Total Success: 31
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 11:56:37.598085 +0000 UTC
+Elapsed Time: 7.691352s
+Threads: 2
+Total Requests: 28
+Avg Request Time: 67.135071ms
+Total Success: 28
+Total Timeouts: 0
+Total Failures: 0
+
+Start Time: 2017-08-19 11:56:38.583165 +0000 UTC
+Elapsed Time: 8.676432s
+Threads: 2
+Total Requests: 29
+Avg Request Time: 73.928413ms
+Total Success: 29
 Total Timeouts: 0
 Total Failures: 0
 

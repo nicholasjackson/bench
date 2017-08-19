@@ -34,6 +34,11 @@ func (r *Run) Help() string {
 func (r *Run) Run(args []string) int {
 	r.flagSet.Parse(args)
 
+	benchServer := os.Getenv("BENCH_ADDR")
+	if benchServer == "" {
+		benchServer = "localhost:9999"
+	}
+
 	if r.pluginLocation != "" {
 		req := proto.RunRequest{
 			PluginLocation: r.pluginLocation,
@@ -43,7 +48,7 @@ func (r *Run) Run(args []string) int {
 			Timeout:        int64(r.timeout),
 		}
 
-		client := server.NewGRPCClient()
+		client := server.NewGRPCClient(benchServer)
 
 		go func(cl *server.GRPCClient) {
 			c := make(chan os.Signal, 1)
