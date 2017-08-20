@@ -2,6 +2,8 @@ package commands
 
 import (
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"time"
@@ -40,12 +42,18 @@ func (r *Run) Run(args []string) int {
 	}
 
 	if r.pluginLocation != "" {
+		data, err := ioutil.ReadFile(r.pluginLocation)
+		if err != nil {
+			fmt.Println(err)
+			return 1
+		}
+
 		req := proto.RunRequest{
-			PluginLocation: r.pluginLocation,
-			Threads:        int64(r.threads),
-			Duration:       int64(r.duration),
-			Ramp:           int64(r.rampUp),
-			Timeout:        int64(r.timeout),
+			Plugin:   data,
+			Threads:  int64(r.threads),
+			Duration: int64(r.duration),
+			Ramp:     int64(r.rampUp),
+			Timeout:  int64(r.timeout),
 		}
 
 		client := server.NewGRPCClient(benchServer)

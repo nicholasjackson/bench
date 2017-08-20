@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/url"
@@ -28,22 +29,40 @@ var benchProcess *bench.Bench
 var plug *plugin.Client
 var benchClient shared.Bench
 
+// GRPCServer implements the gRPC bench server
 type GRPCServer struct {
 	serf *agent.Agent
 	port int
 }
 
+// Execute executes a test using the plugin
 func (g *GRPCServer) Execute(context.Context, *proto.ExecuteRequest) (*proto.ServerEmpty, error) {
 	return &proto.ServerEmpty{}, benchClient.Do()
 }
 
+// StartPlugin starts the bench plugin
 func (g *GRPCServer) StartPlugin(c context.Context, pr *proto.StartPluginRequest) (*proto.ServerEmpty, error) {
-	log.Println("Start Plugin")
-	plug, benchClient = createPlugin(pr.PluginLocation)
+	// create a temporary folder
+	path, err := ioutil.TempDir("/tmp", "bench")
+	if err != nil {
+		return &proto.ServerEmpty{}, err
+	}
+
+	filename := path + "/plugin"
+
+	err = ioutil.WriteFile(filename, pr.Plugin, 0777)
+	if err != nil {
+		return &proto.ServerEmpty{}, err
+	}
+
+	log.Println("Received plugin:", filename)
+
+	plug, benchClient = createPlugin(filename)
 
 	return &proto.ServerEmpty{}, nil
 }
 
+// Run runs a bench load test
 func (g *GRPCServer) Run(c context.Context, r *proto.RunRequest) (*proto.ServerEmpty, error) {
 	log.Println("Running Bench")
 
@@ -56,22 +75,25 @@ func (g *GRPCServer) Run(c context.Context, r *proto.RunRequest) (*proto.ServerE
 		log.Println("Start Plugin:", server)
 		client := NewGRPCClient(server)
 		defer client.Close()
-		client.StartPlugin(r.PluginLocation)
+
+		client.StartPlugin(r.Plugin)
 	}
 
-	runBench(r.PluginLocation, members, r.Threads, time.Duration(r.Duration), time.Duration(r.Ramp), time.Duration(r.Timeout))
+	runBench(members, r.Threads, time.Duration(r.Duration), time.Duration(r.Ramp), time.Duration(r.Timeout))
 
 	return &proto.ServerEmpty{}, nil
 }
 
+// Stop stops a bench load test
 func (g *GRPCServer) Stop(c context.Context, r *proto.ServerEmpty) (*proto.ServerEmpty, error) {
 	benchProcess.Stop()
 	return &proto.ServerEmpty{}, nil
 }
 
+// NewGRPCServer creates a new instance of the bench gRPC server
 func NewGRPCServer(serf *agent.Agent, port int) {
 	log.Println("Starting Bench Server on Port:", port)
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.MaxRecvMsgSize(20 * 1024 * 1024))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
@@ -114,7 +136,7 @@ func createPlugin(pluginLocation string) (*plugin.Client, shared.Bench) {
 	return c, plug.(shared.Bench)
 }
 
-func runBench(location string, servers []string, threads int64, duration time.Duration, ramp time.Duration, timeout time.Duration) {
+func runBench(servers []string, threads int64, duration time.Duration, ramp time.Duration, timeout time.Duration) {
 	benchProcess = bench.New(int(threads), duration, ramp, timeout)
 
 	benchProcess.AddOutput(0*time.Second, os.Stdout, output.WriteTabularData)

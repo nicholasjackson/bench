@@ -4,15 +4,15 @@ package proto;
 message ExecuteRequest {}
 
 message  RunRequest {
-  string pluginLocation  = 1;
-  int64  threads         = 2;
-  int64  duration        = 3;
-  int64  ramp            = 4;
-  int64  timeout         = 5;
+  bytes  plugin   = 1;
+  int64  threads  = 2;
+  int64  duration = 3;
+  int64  ramp     = 4;
+  int64  timeout  = 5;
 }
 
 message StartPluginRequest {
-  string pluginLocation = 1;
+  bytes plugin = 1;
 }
 
 message ServerEmpty {}
