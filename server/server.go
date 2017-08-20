@@ -27,17 +27,17 @@ import (
 
 var benchProcess *bench.Bench
 var plug *plugin.Client
-var benchClient shared.Bench
 
 // GRPCServer implements the gRPC bench server
 type GRPCServer struct {
-	serf *agent.Agent
-	port int
+	serf        *agent.Agent
+	port        int
+	benchClient shared.Bench
 }
 
 // Execute executes a test using the plugin
 func (g *GRPCServer) Execute(context.Context, *proto.ExecuteRequest) (*proto.ServerEmpty, error) {
-	return &proto.ServerEmpty{}, benchClient.Do()
+	return &proto.ServerEmpty{}, g.benchClient.Do()
 }
 
 // StartPlugin starts the bench plugin
@@ -57,7 +57,7 @@ func (g *GRPCServer) StartPlugin(c context.Context, pr *proto.StartPluginRequest
 
 	log.Println("Received plugin:", filename)
 
-	plug, benchClient = createPlugin(filename)
+	plug, g.benchClient = createPlugin(filename)
 
 	return &proto.ServerEmpty{}, nil
 }
