@@ -15,7 +15,7 @@ func main() {
 
 	fmt.Println("Benchmarking application")
 
-	b := bench.New(1, 37*time.Second, 0*time.Second, 2*time.Second)
+	b := bench.New(true, 1, 37*time.Second, 0*time.Second, 2*time.Second)
 	b.AddOutput(0*time.Second, os.Stdout, output.WriteTabularData)
 	b.AddOutput(1*time.Second, util.NewFile("./output.txt"), output.WriteTabularData)
 	b.AddOutput(1*time.Second, util.NewFile("./output.png"), output.PlotData)
