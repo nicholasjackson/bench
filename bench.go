@@ -44,7 +44,7 @@ func New(
 	timeout time.Duration) *Bench {
 
 	return &Bench{
-		showProgress: showOutput,
+		showProgress: showProgress,
 		threads:      threads,
 		duration:     duration,
 		rampUp:       rampUp,
