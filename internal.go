@@ -13,7 +13,7 @@ import (
 // RunBenchmarks executes the benchmarks based upon the given criteria
 //
 // Returns a resultset
-func (b *Bench) internalRun() results.ResultSet {
+func (b *Bench) internalRun(showProgress bool) results.ResultSet {
 
 	startTime := time.Now()
 	endTime := startTime.Add(b.duration)
@@ -22,7 +22,7 @@ func (b *Bench) internalRun() results.ResultSet {
 	out := make(chan results.Result)
 	resultsChan := make(chan []results.Result)
 
-	go handleResult(out, resultsChan)
+	go handleResult(showProgress, out, resultsChan)
 
 	for run := true; run; run = (time.Now().Before(endTime)) {
 
@@ -47,7 +47,7 @@ func (b *Bench) internalRun() results.ResultSet {
 	return <-resultsChan
 }
 
-func handleResult(out chan results.Result, resultChan chan []results.Result) {
+func handleResult(showProgress bool, out chan results.Result, resultChan chan []results.Result) {
 
 	green := color.New(color.FgGreen)
 	red := color.New(color.FgRed)
@@ -56,13 +56,15 @@ func handleResult(out chan results.Result, resultChan chan []results.Result) {
 	var r []results.Result
 
 	for result := range out {
-		switch result.Error.(type) {
-		case errors.Timeout:
-			yellow.Print("T")
-		case error:
-			red.Print("E")
-		default:
-			green.Print(".")
+		if showProgress {
+			switch result.Error.(type) {
+			case errors.Timeout:
+				yellow.Print("T")
+			case error:
+				red.Print("E")
+			default:
+				green.Print(".")
+			}
 		}
 
 		r = append(r, result)
@@ -86,7 +88,7 @@ func doRequest(r RequestFunc, timeout time.Duration, semaphore *semaphore.Semaph
 			if recover := recover(); r != nil {
 
 				complete <- results.Result{
-					Error:       fmt.Errorf("Panic: %v\n", recover),
+					Error:       fmt.Errorf("panic: %v", recover),
 					RequestTime: time.Now().Sub(requestStart),
 					Timestamp:   time.Now(),
 					Threads:     semaphore.Capacity(),

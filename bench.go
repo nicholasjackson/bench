@@ -19,12 +19,13 @@ type outputContainer struct {
 
 // Bench is the main application object it allows the profiling of calls to a remote endpoint defined by a Request
 type Bench struct {
-	threads  int
-	duration time.Duration
-	rampUp   time.Duration
-	timeout  time.Duration
-	outputs  []outputContainer
-	request  RequestFunc
+	threads      int
+	duration     time.Duration
+	rampUp       time.Duration
+	timeout      time.Duration
+	outputs      []outputContainer
+	request      RequestFunc
+	showProgress bool
 }
 
 // New creates a new bench and intializes the intial values of...
@@ -36,16 +37,18 @@ type Bench struct {
 //
 // returns a new Bench instance
 func New(
+	showProgress bool,
 	threads int,
 	duration time.Duration,
 	rampUp time.Duration,
 	timeout time.Duration) *Bench {
 
 	return &Bench{
-		threads:  threads,
-		duration: duration,
-		rampUp:   rampUp,
-		timeout:  timeout,
+		showProgress: showOutput,
+		threads:      threads,
+		duration:     duration,
+		rampUp:       rampUp,
+		timeout:      timeout,
 	}
 }
 
@@ -65,6 +68,6 @@ func (b *Bench) AddOutput(interval time.Duration, writer io.Writer, output outpu
 func (b *Bench) RunBenchmarks(r RequestFunc) {
 
 	b.request = r
-	results := b.internalRun()
+	results := b.internalRun(b.showProgress)
 	b.processResults(results)
 }
